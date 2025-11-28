@@ -1,5 +1,5 @@
 /**
- * CleanTrack Core Utilities (VERSION 11 - FORCE SYNC)
+ * CleanTrack Core Utilities (VERSION 12 - SYNC FIX & CLEAN SLATE)
  * File: user-utils.js
  */
 
@@ -7,36 +7,36 @@ const KEYS = {
     REPORTS: 'shared_reports',
     USERS: 'shared_users',
     TRANSACTIONS: 'shared_tx',
-    REWARDS: 'shared_rewards', 
+    REWARDS: 'shared_rewards', // Kunci yang SAMA dengan Admin
     CURRENT_SESSION: 'active_session',
-    INIT_FLAG: 'cleanTrack_v11_force_sync' // GANTI KE V11 UTK PAKSA MUNCUL DATA
+    INIT_FLAG: 'cleanTrack_v12_sync_fix' // Versi baru untuk reset data otomatis
 };
 
 // ==========================================
 // 0. ASSET LIBRARY (KOLEKSI GAMBAR REALISTIS & HD)
 // ==========================================
 
-// Koleksi Foto Sampah/Kebersihan Berkualitas Tinggi (Stable Unsplash IDs)
+// Koleksi Foto Sampah/Kebersihan Berkualitas Tinggi
 const TRASH_IMAGES = [
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=600&auto=format&fit=crop", // Tumpukan Plastik (HD)
-    "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=600&auto=format&fit=crop", // Botol Plastik Berserakan (HD)
-    "https://images.unsplash.com/photo-1523293836945-3f9f872849de?q=80&w=600&auto=format&fit=crop", // Tong Sampah Penuh (HD)
-    "https://images.unsplash.com/photo-1605600659908-0ef719419d41?q=80&w=600&auto=format&fit=crop", // Sampah di Pinggir Jalan (HD)
-    "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=600&auto=format&fit=crop", // Sampah di Pantai/Pasir (HD)
-    "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?q=80&w=600&auto=format&fit=crop", // Kardus/Kertas Bekas (HD)
-    "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=600&auto=format&fit=crop", // Sampah Elektronik/Kabel (HD)
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"  // Sampah Industri/Pipa (HD)
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1523293836945-3f9f872849de?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1605600659908-0ef719419d41?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=600&auto=format&fit=crop", 
+    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"  
 ];
 
-// Koleksi Avatar Warga (Campuran Gender)
+// Koleksi Avatar Warga
 const USER_AVATARS = [
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop", // Naufal (Cool Guy)
-    "https://randomuser.me/api/portraits/men/32.jpg", // Budi
-    "https://randomuser.me/api/portraits/women/44.jpg", // Siti
-    "https://randomuser.me/api/portraits/women/68.jpg", // Rina
-    "https://randomuser.me/api/portraits/men/86.jpg", // Ahmad
-    "https://randomuser.me/api/portraits/men/15.jpg", // Dedi
-    "https://randomuser.me/api/portraits/women/65.jpg"  // Maya
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop", // Naufal
+    "https://randomuser.me/api/portraits/men/32.jpg", 
+    "https://randomuser.me/api/portraits/women/44.jpg", 
+    "https://randomuser.me/api/portraits/women/68.jpg", 
+    "https://randomuser.me/api/portraits/men/86.jpg", 
+    "https://randomuser.me/api/portraits/men/15.jpg", 
+    "https://randomuser.me/api/portraits/women/65.jpg"  
 ];
 
 // ==========================================
@@ -44,11 +44,11 @@ const USER_AVATARS = [
 // ==========================================
 
 (function initSharedData() {
-    // Hanya jalankan jika data versi baru belum ada
+    // Cek apakah data versi terbaru sudah ada
     if (!sessionStorage.getItem(KEYS.INIT_FLAG)) {
-        console.log("🚀 Initializing CleanTrack Realistic Data Ecosystem (HD Images)...");
+        console.log("🚀 Initializing CleanTrack Data (Clean History & Synced Rewards)...");
 
-        // --- A. GENERATE USERS (7 ORANG) ---
+        // --- A. GENERATE USERS (POIN 0 UNTUK KEASLIAN) ---
         const userNames = [
             "Naufal Ihsanul", "Budi Santoso", "Siti Aminah", 
             "Rina Wati", "Ahmad Dani", "Dedi Corbuzier", "Maya Esti"
@@ -59,7 +59,7 @@ const USER_AVATARS = [
         users.push({
             id: 'ADM-001', name: 'Super Admin', email: 'admin', password: 'admin',
             role: 'ADMIN', phone: '-', 
-            avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop', // Business man
+            avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop',
             joined: '01/01/2025', status: 'Active', points: 9999
         });
 
@@ -70,22 +70,59 @@ const USER_AVATARS = [
                 id: `USR-00${index + 1}`,
                 name: name,
                 email: isMainUser ? 'naufal' : `user${index + 1}@mail.com`,
-                password: '123',
+                password: isMainUser ? '123' : '123',
                 role: 'USER',
                 phone: `0812${Math.floor(10000000 + Math.random() * 90000000)}`,
-                // Gunakan avatar dari array USER_AVATARS
                 avatar: USER_AVATARS[index] || `https://ui-avatars.com/api/?name=${name}`,
-                joined: getRandomDate('year'), // Random gabung tahun ini
-                status: index === 5 ? 'Blocked' : 'Active', // User ke-6 kita blokir buat demo
-                points: isMainUser ? 150 : Math.floor(Math.random() * 500)
+                joined: getRandomDate('year'), 
+                status: index === 5 ? 'Blocked' : 'Active',
+                points: 0 // CLEAN SLATE: Poin awal 0 agar realistis
             });
         });
         sessionStorage.setItem(KEYS.USERS, JSON.stringify(users));
 
 
-        // --- B. GENERATE REPORTS (NESTED LOOP) ---
-        // UPDATE: Kategori dihapus, diganti hardcode "Laporan Kebersihan"
-        
+        // --- B. GENERATE REWARDS (SINKRONISASI ADMIN & USER) ---
+        // Kita buat data hadiah di sini agar User langsung melihatnya tanpa harus buka Admin dulu.
+        const defaultRewards = [
+            {
+                id: 'RWD-001',
+                name: 'Token PLN 20k',
+                cost: 200,
+                category: 'PLN',
+                description: 'Voucher listrik prabayar nominal 20.000.',
+                stock: 50,
+                image: 'https://images.unsplash.com/photo-1550565118-c974fb636248?auto=format&fit=crop&w=300&q=80',
+                api_provider: 'NUSANTARA_DATA',
+                api_code: 'PLN20'
+            },
+            {
+                id: 'RWD-002',
+                name: 'Pulsa Reguler 10k',
+                cost: 100,
+                category: 'Pulsa',
+                description: 'Pulsa All Operator masa aktif 30 hari.',
+                stock: 100,
+                image: 'https://images.unsplash.com/photo-1512428559087-560fa5ce7d5b?auto=format&fit=crop&w=300&q=80',
+                api_provider: 'NUSANTARA_DATA',
+                api_code: 'HPS10'
+            },
+            {
+                id: 'RWD-003',
+                name: 'Saldo GoPay 50k',
+                cost: 500,
+                category: 'E-Wallet',
+                description: 'Top up saldo e-wallet instan tanpa biaya admin.',
+                stock: 25,
+                image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=300&q=80',
+                api_provider: 'GOPAY_CORP',
+                api_code: 'GOPAY50'
+            }
+        ];
+        sessionStorage.setItem(KEYS.REWARDS, JSON.stringify(defaultRewards));
+
+
+        // --- C. GENERATE REPORTS (Laporan Tetap Ada) ---
         const locations = [
             "Jl. Udayana, Mataram", "Taman Sangkareang", "Pasar Kebon Roek", 
             "Pantai Ampenan", "Jl. Majapahit", "Simpang Lima", "Taman Mayura",
@@ -96,63 +133,47 @@ const USER_AVATARS = [
         let reports = [];
         let reportCounter = 10000;
 
-        // Loop User (Hanya role USER)
-        users.filter(u => u.role === 'USER').forEach((user, uIndex) => {
-            
-            
-            for (let i = 0; i < 6; i++) {
-                
-                // Distribusi Waktu
-                let timeCategory = 'year';
-                if (i === 0) timeCategory = 'today';
-                else if (i <= 2) timeCategory = 'week';
-                else if (i <= 4) timeCategory = 'month';
-
-                const dateStr = getRandomDate(timeCategory);
+        users.filter(u => u.role === 'USER').forEach((user) => {
+            // Kita kurangi jumlah laporan dummy agar tidak terlalu penuh
+            for (let i = 0; i < 4; i++) {
+                const dateStr = getRandomDate('month');
                 const status = statuses[Math.floor(Math.random() * statuses.length)];
-                
-                // PILIH FOTO SECARA ACAK DARI KOLEKSI HD
                 const photoUrl = TRASH_IMAGES[Math.floor(Math.random() * TRASH_IMAGES.length)];
 
-                // Admin Notes Logic
                 let adminNotes = "";
-                if (status === 'Rejected') adminNotes = "Foto bukti buram atau lokasi tidak dapat ditemukan tim lapangan.";
-                if (status === 'Resolved') adminNotes = "Laporan selesai ditindaklanjuti. Area sudah bersih.";
-                if (status === 'In Progress') adminNotes = "Tim kebersihan sedang menuju ke lokasi.";
+                if (status === 'Rejected') adminNotes = "Foto bukti buram atau lokasi tidak valid.";
+                if (status === 'Resolved') adminNotes = "Laporan selesai ditindaklanjuti.";
+                if (status === 'In Progress') adminNotes = "Tim sedang menuju lokasi.";
 
                 reports.push({
                     id: `CTR-${reportCounter++}`,
                     userId: user.id,
                     reporterName: user.name,
-                    category: "Laporan Kebersihan", // HARDCODED (Sesuai Request)
+                    category: "Laporan Kebersihan",
                     location: locations[Math.floor(Math.random() * locations.length)],
-                    description: `Ditemukan tumpukan sampah di area ${locations[Math.floor(Math.random() * locations.length)]}. Mengganggu kenyamanan warga.`,
+                    description: `Ditemukan tumpukan sampah yang mengganggu di area ini.`,
                     status: status,
                     priority: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
                     date: dateStr,
                     photos: [photoUrl], 
-                    rating: status === 'Resolved' && Math.random() > 0.5 ? Math.floor(Math.random() * 5) + 1 : null,
-                    reviewContent: status === 'Resolved' ? "Respon sangat cepat, terima kasih!" : null,
+                    rating: status === 'Resolved' && Math.random() > 0.5 ? 5 : null,
+                    reviewContent: status === 'Resolved' ? "Terima kasih respon cepatnya!" : null,
                     adminNotes: adminNotes,
                     timeline: [{ status: 'Submitted', date: dateStr, latest: true }]
                 });
             }
         });
-        
-        // Sort reports: Terbaru di atas
         reports.reverse();
         sessionStorage.setItem(KEYS.REPORTS, JSON.stringify(reports));
 
 
-        // --- C. GENERATE TRANSACTIONS ---
-        const txs = [
-            { id: 'TX-001', date: getRandomDate('month'), type: 'CREDIT', amount: 50, description: 'Bonus Pengguna Baru' },
-            { id: 'TX-002', date: getRandomDate('week'), type: 'CREDIT', amount: 100, description: 'Reward Laporan Sampah' },
-            { id: 'TX-003', date: getRandomDate('today'), type: 'DEBIT', amount: 20, description: 'Tukar: Pulsa 5k' }
-        ];
+        // --- D. GENERATE TRANSACTIONS (CLEAN HISTORY) ---
+        // Array KOSONG agar akun terlihat baru dan bersih
+        const txs = []; 
         sessionStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
 
-        // Set Flag Selesai (Versi Baru)
+
+        // Set Flag Selesai
         sessionStorage.setItem(KEYS.INIT_FLAG, 'true');
     }
 })();
@@ -166,14 +187,10 @@ function getRandomDate(category) {
     let daysBack = 0;
 
     switch(category) {
-        case 'today': 
-            daysBack = 0; break;
-        case 'week': 
-            daysBack = Math.floor(Math.random() * 6) + 1; break;
-        case 'month': 
-            daysBack = Math.floor(Math.random() * 20) + 8; break;
-        case 'year': 
-            daysBack = Math.floor(Math.random() * 200) + 31; break;
+        case 'today': daysBack = 0; break;
+        case 'week': daysBack = Math.floor(Math.random() * 6) + 1; break;
+        case 'month': daysBack = Math.floor(Math.random() * 20) + 8; break;
+        case 'year': daysBack = Math.floor(Math.random() * 200) + 31; break;
     }
 
     pastDate.setDate(today.getDate() - daysBack);
@@ -213,6 +230,7 @@ function updateUserPoints(userId, amount, description) {
         });
         sessionStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
 
+        // Update active session if needed
         const currentSession = getActiveSession();
         if (currentSession && currentSession.id === userId) {
             currentSession.points = users[index].points;
@@ -256,6 +274,7 @@ function getTransactionHistory() {
     const session = getActiveSession();
     const all = JSON.parse(sessionStorage.getItem(KEYS.TRANSACTIONS)) || [];
     if(!session) return [];
+    // Filter transaksi hanya milik user yang sedang login
     return all.filter(tx => !tx.userId || tx.userId === session.id);
 }
 
@@ -282,7 +301,7 @@ function loginUser(email, password) {
 
 function logoutUser() {
     sessionStorage.removeItem(KEYS.CURRENT_SESSION);
-    window.location.href = 'Login.html'; // Redirect to Login
+    window.location.href = 'Login.html'; 
 }
 
 function requireLogin() {

@@ -36,7 +36,7 @@ Aplikasi ini dibangun menggunakan **Native Web Technologies** (Vanilla) untuk pe
 - **Maps:** [Leaflet.js](https://leafletjs.com/) (OpenStreetMap).
 - **Animations:** [AOS](https://michalsnik.github.io/aos/).
 - **Charts:** [Chart.js](https://www.chartjs.org/).
-- **Database:** `sessionStorage` (Simulasi Database Lokal pada Browser).
+- **Database:** `sessionStorage`.
 
 ---
 
@@ -74,7 +74,7 @@ _Akses ke Pelaporan, Peta Publik, dan Penukaran Poin._
 - **Username:** `naufal`
 - **Password:** `123`
 
-_(Anda juga bisa mendaftar akun baru melalui menu Register)_
+_(Bisa juga bisa mendaftar akun baru melalui menu Register)_
 
 ---
 

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard - CleanTrack Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2A62C8",
+                        "secondary": "#50E3C2",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#1a1a1a",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#242424",
+                        "border-light": "#e0e0e0",
+                        "border-dark": "#3a3a3a",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+
+    <script src="admin-header.js"></script>
+    <script src="admin-utils.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+        /* Hide Scrollbar Global */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        html,
+        body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+    </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100">
+    <div class="min-h-screen flex flex-col">
+
+        <!-- Header Container (Diisi oleh admin-header.js) -->
+        <div id="app-header"></div>
+
+        <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <div class="mb-8" data-aos="fade-down">
+                <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Dashboard Overview</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Pantau kinerja operasional dan statistik lingkungan
+                    secara real-time.</p>
+            </div>
+
+            <!-- RESPONSIVE STATS GRID -->
+            <!-- Mobile: 1 Col, Tablet (md): 2 Col, Desktop (lg): 4 Col -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+
+                <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm flex items-center gap-4"
+                    data-aos="zoom-in" data-aos-delay="0">
+                    <div
+                        class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-2xl">folder_open</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider truncate">Total Laporan</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white" id="stat-total">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm flex items-center gap-4"
+                    data-aos="zoom-in" data-aos-delay="100">
+                    <div
+                        class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center animate-pulse flex-shrink-0">
+                        <span class="material-symbols-outlined text-2xl">hourglass_top</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider truncate">Perlu Tindakan</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white" id="stat-pending">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm flex items-center gap-4"
+                    data-aos="zoom-in" data-aos-delay="200">
+                    <div
+                        class="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-2xl">check_circle</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider truncate">Terselesaikan</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white" id="stat-resolved">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm flex items-center gap-4"
+                    data-aos="zoom-in" data-aos-delay="300">
+                    <div
+                        class="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-2xl">star</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider truncate">Rating Rata-rata
+                        </p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white" id="stat-rating">0.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS GRID -->
+            <!-- Stack on Mobile/Tablet, 3 Columns on Desktop -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm"
+                    data-aos="fade-right">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gray-400">pie_chart</span> Distribusi Status
+                    </h3>
+                    <div class="h-64 relative w-full">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm"
+                    data-aos="fade-left">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gray-400">show_chart</span> Tren Kenaikan Laporan
+                    </h3>
+                    <div class="h-64 w-full">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT REPORTS & FEEDBACK -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <div class="lg:col-span-2 space-y-6" data-aos="fade-up">
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden">
+                        <div
+                            class="p-6 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+                            <h2 class="font-bold text-lg text-gray-900 dark:text-white">Laporan Terbaru Masuk</h2>
+                            <a href="AdminReports.html" class="text-sm font-bold text-primary hover:underline">Lihat
+                                Semua</a>
+                        </div>
+
+                        <!-- RESPONSIVE TABLE CONTAINER -->
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-gray-50 dark:bg-gray-800 text-xs uppercase text-gray-500 font-bold">
+                                    <tr>
+                                        <th class="px-6 py-4">ID & Pelapor</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-table-body"
+                                    class="divide-y divide-border-light dark:divide-border-dark">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1" data-aos="fade-up" data-aos-delay="200">
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm h-full flex flex-col">
+                        <div
+                            class="p-6 border-b border-border-light dark:border-border-dark bg-yellow-50/50 dark:bg-yellow-900/10">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="material-symbols-outlined text-yellow-600">forum</span>
+                                <h2 class="font-black text-lg text-gray-900 dark:text-white uppercase tracking-tight">
+                                    Suara Warga</h2>
+                            </div>
+                            <p class="text-xs text-gray-500">Umpan balik langsung dari publik.</p>
+                        </div>
+
+                        <div id="reviews-feed"
+                            class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[500px] bg-gray-50 dark:bg-gray-900/20">
+                            <div class="text-center py-10 text-gray-400">
+                                <span class="material-symbols-outlined text-4xl mb-2">reviews</span>
+                                <p class="text-sm">Belum ada ulasan warga.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // INIT AOS
+        AOS.init();
+
+        // Global Chart Instances
+        let statusChartInstance = null;
+        let trendChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAdminHeader('dashboard');
+            initAdminData();
+            loadDashboardData();
+
+            window.addEventListener('storageUpdated', loadDashboardData);
+        });
+
+        function loadDashboardData() {
+            const reports = getReports();
+
+            // 1. UPDATE STATS CARDS
+            const total = reports.length;
+            const pending = reports.filter(r => r.status === 'Pending').length;
+            const resolved = reports.filter(r => r.status === 'Resolved').length;
+            const rejected = reports.filter(r => r.status === 'Rejected').length;
+            const inProgress = reports.filter(r => r.status === 'In Progress').length;
+
+            const ratedReports = reports.filter(r => r.rating > 0);
+            const avgRating = ratedReports.length > 0
+                ? (ratedReports.reduce((acc, curr) => acc + curr.rating, 0) / ratedReports.length).toFixed(1)
+                : "0.0";
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('stat-resolved').textContent = resolved;
+            document.getElementById('stat-rating').textContent = avgRating;
+
+            // 2. RENDER CHARTS
+            renderCharts(pending, inProgress, resolved, rejected, reports);
+
+            // 3. RENDER RECENT TABLE
+            const recentReports = [...reports].sort((a, b) => new Date(parseDateID(b.date)) - new Date(parseDateID(a.date))).slice(0, 5);
+            const tbody = document.getElementById('recent-table-body');
+            tbody.innerHTML = '';
+
+            recentReports.forEach(r => {
+                const statusStyle = getStatusColor(r.status);
+                const html = `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-gray-900 dark:text-white">${r.reporterName}</span>
+                                <span class="text-[10px] text-gray-400 font-mono">${r.id}</span>
+                                <span class="text-[10px] text-gray-500 mt-0.5">${r.date}</span>
+                            </div>
+                        </td>
+                        
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${statusStyle.badge}">
+                                ${r.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="AdminReportDetail.html?id=${r.id}" class="text-primary hover:text-blue-700 font-bold text-xs">Detail</a>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', html);
+            });
+
+            // 4. RENDER SOCIAL PROOF
+            const reviews = reports.filter(r => r.status === 'Resolved' && (r.rating > 0 || r.reviewContent));
+            const feed = document.getElementById('reviews-feed');
+
+            if (reviews.length > 0) {
+                feed.innerHTML = '';
+                reviews.forEach(r => {
+                    const stars = '★'.repeat(r.rating || 0) + '☆'.repeat(5 - (r.rating || 0));
+                    const textContent = r.reviewContent ? `"${r.reviewContent}"` : "<i>(User memberikan rating tanpa komentar)</i>";
+
+                    const card = `
+                        <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-gray-200 dark:border-border-dark shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
+                                        ${r.reporterName.charAt(0)}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-gray-800 dark:text-gray-200">${r.reporterName}</span>
+                                        <span class="text-[10px] text-gray-400">${r.date}</span>
+                                    </div>
+                                </div>
+                                <span class="text-yellow-500 text-sm tracking-widest font-black">${stars}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 italic mb-3 relative z-10">${textContent}</p>
+                            <div class="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">Laporan:</span>
+                                <a href="AdminReportDetail.html?id=${r.id}" class="text-[10px] font-bold text-primary hover:underline truncate max-w-[150px]">#${r.id}</a>
+                            </div>
+                        </div>
+                    `;
+                    feed.insertAdjacentHTML('beforeend', card);
+                });
+            }
+        }
+
+        function renderCharts(pending, inProgress, resolved, rejected, allReports) {
+            // -- PIE CHART (STATUS) --
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            statusChartInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'In Progress', 'Resolved', 'Rejected'],
+                    datasets: [{
+                        data: [pending, inProgress, resolved, rejected],
+                        backgroundColor: [
+                            '#F59E0B', '#3B82F6', '#10B981', '#EF4444'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } }
+                    }
+                }
+            });
+
+            // -- UPDATE: LINE CHART (REPORT TREND) --
+            const trendData = {};
+            const sortedReports = [...allReports].sort((a, b) => parseDateID(a.date) - parseDateID(b.date));
+
+            sortedReports.forEach(r => {
+                const dateKey = r.date;
+                trendData[dateKey] = (trendData[dateKey] || 0) + 1;
+            });
+
+            const labels = Object.keys(trendData).slice(-10);
+            const dataPoints = labels.map(label => trendData[label]);
+
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            trendChartInstance = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Laporan Masuk',
+                        data: dataPoints,
+                        borderColor: '#2A62C8',
+                        backgroundColor: 'rgba(42, 98, 200, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#2A62C8',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: '#f0f0f0' },
+                            ticks: { precision: 0 }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

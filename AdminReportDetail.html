@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Report Details - CleanTrack Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2A62C8",
+                        "secondary": "#50E3C2",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#1a1a1a",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#242424",
+                        "border-light": "#e0e0e0",
+                        "border-dark": "#3a3a3a",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+
+    <script src="admin-header.js"></script>
+    <script src="admin-utils.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+        /* Hide Scrollbar Global */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        html,
+        body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .dark .leaflet-layer {
+            filter: brightness(0.8) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+        }
+
+        /* Style untuk tombol disabled */
+        button:disabled {
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100">
+    <div class="min-h-screen flex flex-col">
+
+        <div id="app-header"></div>
+
+        <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+                data-aos="fade-down">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <a href="AdminReports.html" class="hover:text-primary transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Reports
+                    </a>
+                    <span>/</span>
+                    <span class="font-bold text-gray-800 dark:text-gray-200" id="header-id">Loading...</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="deleteCurrentReport()"
+                        class="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors">
+                        <span class="material-symbols-outlined text-lg">delete</span> Delete
+                    </button>
+                    <button id="btn-save"
+                        class="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30 disabled:opacity-50 disabled:bg-gray-400">
+                        <span class="material-symbols-outlined text-lg">save</span> Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- KIRI: Foto & Peta (Fade Right) -->
+                <div class="lg:col-span-2 space-y-6" data-aos="fade-right">
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark p-1 rounded-xl border border-border-light dark:border-border-dark shadow-sm">
+                        <div
+                            class="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 group">
+                            <img id="detail-photo" src="" alt="Report Evidence"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div
+                                class="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
+                                Evidence Photo
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">map</span> Location Context
+                        </h3>
+                        <div
+                            class="h-64 w-full rounded-lg overflow-hidden border border-border-light dark:border-border-dark relative z-0">
+                            <div id="map"></div>
+                        </div>
+                        <div
+                            class="mt-4 flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-800 dark:text-blue-200">
+                            <span class="material-symbols-outlined text-lg mt-0.5">location_on</span>
+                            <div>
+                                <p class="font-bold">Reported Location</p>
+                                <p id="detail-location">Loading location...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KANAN: Panel Kontrol (Fade Left) -->
+                <div class="lg:col-span-1 space-y-6" data-aos="fade-left">
+
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-md ring-1 ring-primary/5">
+                        <h3 class="font-bold text-lg mb-6 border-b border-border-light dark:border-border-dark pb-4">
+                            Execution Panel</h3>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Update
+                                    Status</label>
+                                <div class="relative">
+                                    <select id="input-status"
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-surface-dark font-bold focus:ring-primary focus:border-primary transition-all">
+                                        <option value="Pending">Pending Review</option>
+                                        <option value="In Progress">In Progress (Processing)</option>
+                                        <option value="Resolved">Resolved (Completed)</option>
+                                        <option value="Rejected" class="text-red-600 font-bold">REJECTED (Tolak Laporan)
+                                        </option>
+                                    </select>
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">alt_route</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1 ml-1" id="status-helper">
+                                    Status "Rejected" membutuhkan alasan wajib.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Priority
+                                    Level</label>
+                                <div class="flex gap-2">
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="priority" value="Low" class="peer sr-only">
+                                        <div
+                                            class="text-center py-2 border rounded-lg peer-checked:bg-gray-200 dark:peer-checked:bg-gray-700 peer-checked:border-gray-400 font-medium text-sm transition-all text-gray-500 hover:bg-gray-50">
+                                            Low</div>
+                                    </label>
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="priority" value="Medium" class="peer sr-only">
+                                        <div
+                                            class="text-center py-2 border rounded-lg peer-checked:bg-orange-100 peer-checked:text-orange-700 peer-checked:border-orange-300 font-bold text-sm transition-all text-gray-500 hover:bg-gray-50">
+                                            Medium</div>
+                                    </label>
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="priority" value="High" class="peer sr-only">
+                                        <div
+                                            class="text-center py-2 border rounded-lg peer-checked:bg-red-100 peer-checked:text-red-700 peer-checked:border-red-300 font-bold text-sm transition-all text-gray-500 hover:bg-gray-50">
+                                            High</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- UPDATE: Panel "Assign Cleanup Team" DIHAPUS sesuai permintaan -->
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm">
+                        <!-- UPDATE: Info Kategori DIHAPUS dari grid -->
+                        <div class="grid grid-cols-1 gap-4 mb-6">
+                            <div>
+                                <p class="text-xs text-gray-500">Date Reported</p>
+                                <p class="font-bold text-sm" id="detail-date">...</p>
+                            </div>
+                            <div class="col-span-1">
+                                <p class="text-xs text-gray-500">Description</p>
+                                <p class="text-sm italic text-gray-600 dark:text-gray-300 mt-1 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700"
+                                    id="detail-desc">...</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                                Tanggapan / Alasan Admin <span class="text-red-500" id="label-required">*</span>
+                            </label>
+                            <p class="text-[10px] text-gray-400 mb-2">
+                                <span class="material-symbols-outlined text-[12px] align-middle">visibility</span>
+                                Teks ini akan terbaca oleh pelapor di aplikasinya. Gunakan bahasa yang sopan.
+                            </p>
+                            <textarea id="input-notes" rows="4"
+                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-surface-dark text-sm focus:ring-primary focus:border-primary p-3 transition-colors"
+                                placeholder="Contoh: Laporan diterima, petugas sedang meluncur... (Wajib diisi jika status Ditolak)"></textarea>
+
+                            <p id="error-notes"
+                                class="hidden text-[10px] text-red-600 font-bold mt-1 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">error</span>
+                                Wajib diisi! Anda tidak boleh menolak laporan tanpa memberikan alasan yang jelas.
+                            </p>
+                        </div>
+
+                        <div id="review-container"
+                            class="hidden mt-6 pt-4 border-t border-border-light dark:border-border-dark">
+                            <p class="text-xs font-bold uppercase text-gray-500 mb-3 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                                Ulasan & Komentar Warga
+                            </p>
+                            <div
+                                class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-xl border border-yellow-100 dark:border-yellow-800/30">
+                                <div class="flex items-center gap-1 mb-2" id="review-stars">
+                                </div>
+                                <p class="text-sm text-gray-800 dark:text-gray-200 font-medium italic"
+                                    id="review-content">
+                                    "..."
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-[9999]">
+        <div class="bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4">
+            <div class="bg-green-500 rounded-full p-1">
+                <span class="material-symbols-outlined text-white text-xl">check</span>
+            </div>
+            <div>
+                <p class="font-bold">Changes Saved</p>
+                <p class="text-xs text-gray-300">User has been notified.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // INIT AOS
+        AOS.init();
+
+        // --- 1. CONFIG & STATE ---
+        let currentReport = null;
+        let map = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAdminHeader('reports');
+            initAdminData();
+
+            // Get ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+
+            if (reportId) {
+                loadReportData(reportId);
+            } else {
+                alert("No Report ID specified. Redirecting...");
+                window.location.href = 'AdminReports.html';
+            }
+
+            // Save Button Listener
+            document.getElementById('btn-save').addEventListener('click', saveChanges);
+
+            // --- VALIDATION LISTENERS (VALIDASI KERAS) ---
+            document.getElementById('input-status').addEventListener('change', handleValidation);
+            document.getElementById('input-notes').addEventListener('input', handleValidation);
+        });
+
+        // --- 2. LOAD DATA ---
+        function loadReportData(id) {
+            const reports = getReports();
+            currentReport = reports.find(r => r.id === id);
+
+            if (!currentReport) {
+                alert("Report not found!");
+                window.location.href = 'AdminReports.html';
+                return;
+            }
+
+            // Populate Text Fields
+            document.getElementById('header-id').textContent = currentReport.id;
+            document.title = `${currentReport.id} - Details`;
+
+            document.getElementById('detail-location').textContent = currentReport.location;
+            // UPDATE: Menghapus pengisian detail-category karena elemennya sudah dihapus
+            document.getElementById('detail-date').textContent = currentReport.date;
+            document.getElementById('detail-desc').textContent = currentReport.description;
+
+            // Populate Inputs
+            document.getElementById('input-status').value = currentReport.status;
+            // UPDATE: Menghapus pengisian input-team
+            document.getElementById('input-notes').value = currentReport.adminNotes || '';
+
+            // Radio Priority
+            const priority = currentReport.priority || 'Medium';
+            const radio = document.querySelector(`input[name="priority"][value="${priority}"]`);
+            if (radio) radio.checked = true;
+
+            // Image Handling
+            const imgEl = document.getElementById('detail-photo');
+            if (currentReport.photos && currentReport.photos.length > 0) {
+                imgEl.src = currentReport.photos[0];
+            } else {
+                imgEl.src = "https://placehold.co/600x400/e2e8f0/64748b?text=No+Evidence+Photo";
+            }
+
+            // Handle User Reviews (NEW: Stars + Text)
+            const reviewContainer = document.getElementById('review-container');
+            if (currentReport.status === 'Resolved' && (currentReport.rating || currentReport.reviewContent)) {
+                reviewContainer.classList.remove('hidden');
+
+                // Render Stars
+                const starsContainer = document.getElementById('review-stars');
+                const rating = currentReport.rating || 0;
+                let starHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    starHTML += (i <= rating)
+                        ? '<span class="material-symbols-outlined text-yellow-500 text-lg fill-current">star</span>'
+                        : '<span class="material-symbols-outlined text-gray-300 text-lg">star</span>';
+                }
+                starsContainer.innerHTML = starHTML;
+
+                // Render Content
+                const contentEl = document.getElementById('review-content');
+                contentEl.textContent = currentReport.reviewContent ? `"${currentReport.reviewContent}"` : "(Warga memberikan rating tanpa komentar)";
+            } else {
+                reviewContainer.classList.add('hidden');
+            }
+
+            // Init Map
+            initMap(currentReport.location);
+
+            // Trigger Validation Check on Load
+            handleValidation();
+        }
+
+        // --- 3. HARD VALIDATION LOGIC ---
+        function handleValidation() {
+            const status = document.getElementById('input-status').value;
+            const notes = document.getElementById('input-notes').value.trim();
+            const btnSave = document.getElementById('btn-save');
+            const notesInput = document.getElementById('input-notes');
+            const errorMsg = document.getElementById('error-notes');
+            const labelReq = document.getElementById('label-required');
+
+            // Aturan: Jika Rejected, Notes Wajib diisi
+            if (status === 'Rejected') {
+                labelReq.classList.remove('hidden');
+                notesInput.placeholder = "WAJIB: Jelaskan alasan penolakan secara sopan dan jelas...";
+
+                if (notes === '') {
+                    // Invalid State (Tombol Mati)
+                    btnSave.disabled = true;
+
+                    notesInput.classList.add('border-red-500', 'bg-red-50', 'focus:border-red-500', 'focus:ring-red-500');
+                    notesInput.classList.remove('border-gray-300', 'focus:border-primary', 'focus:ring-primary');
+                    errorMsg.classList.remove('hidden');
+                } else {
+                    // Valid State (Tombol Hidup)
+                    btnSave.disabled = false;
+
+                    notesInput.classList.remove('border-red-500', 'bg-red-50', 'focus:border-red-500', 'focus:ring-red-500');
+                    notesInput.classList.add('border-gray-300', 'focus:border-primary', 'focus:ring-primary');
+                    errorMsg.classList.add('hidden');
+                }
+            } else {
+                // Normal State (Not Rejected)
+                labelReq.classList.add('hidden');
+                notesInput.placeholder = "Tanggapan untuk warga (Opsional)...";
+                btnSave.disabled = false;
+
+                notesInput.classList.remove('border-red-500', 'bg-red-50', 'focus:border-red-500', 'focus:ring-red-500');
+                notesInput.classList.add('border-gray-300', 'focus:border-primary', 'focus:ring-primary');
+                errorMsg.classList.add('hidden');
+            }
+        }
+
+        // --- 4. MAP LOGIC ---
+        function initMap(locationName) {
+            let lat = -8.5833;
+            let lng = 116.1167;
+
+            // Hash sederhana untuk variasi lokasi
+            let hash = 0;
+            for (let i = 0; i < locationName.length; i++) {
+                hash = ((hash << 5) - hash) + locationName.charCodeAt(i);
+                hash |= 0;
+            }
+            lat += (hash % 100) * 0.0001;
+            lng += (hash % 100) * 0.0001;
+
+            map = L.map('map').setView([lat, lng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(`<b>${locationName}</b><br>Report Location`).openPopup();
+        }
+
+        // --- 5. SAVE ACTIONS ---
+        function saveChanges() {
+            if (!currentReport) return;
+
+            const newStatus = document.getElementById('input-status').value;
+            const newPriority = document.querySelector('input[name="priority"]:checked').value;
+            // UPDATE: Hapus pengambilan value input-team
+            const newNotes = document.getElementById('input-notes').value;
+
+            // Final Double Check
+            if (newStatus === 'Rejected' && !newNotes.trim()) {
+                alert("Mohon isi alasan penolakan di kolom Tanggapan Publik.");
+                return;
+            }
+
+            const reports = getReports();
+            const index = reports.findIndex(r => r.id === currentReport.id);
+
+            if (index !== -1) {
+                // Cek perubahan status untuk Timeline
+                if (reports[index].status !== newStatus) {
+                    if (!reports[index].timeline) reports[index].timeline = [];
+                    reports[index].timeline.forEach(t => t.latest = false);
+
+                    // Tentukan Icon berdasarkan status
+                    let icon = 'sync';
+                    if (newStatus === 'Resolved') icon = 'check_circle';
+                    if (newStatus === 'Rejected') icon = 'cancel'; // Icon Silang
+
+                    reports[index].timeline.unshift({
+                        status: newStatus,
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                        latest: true,
+                        icon: icon
+                    });
+                }
+
+                reports[index].status = newStatus;
+                reports[index].priority = newPriority;
+                // UPDATE: Hapus penyimpanan assignedTo
+                reports[index].adminNotes = newNotes;
+
+                saveReports(reports);
+                showToast();
+
+                currentReport = reports[index];
+                loadReportData(currentReport.id); // Refresh
+            }
+        }
+
+        function deleteCurrentReport() {
+            if (confirm("Are you sure? This action cannot be undone.")) {
+                const reports = getReports();
+                const newReports = reports.filter(r => r.id !== currentReport.id);
+                saveReports(newReports);
+                window.location.href = 'AdminReports.html';
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

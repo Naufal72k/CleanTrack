@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Saya - CleanTrack</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2A62C8",
+                        "secondary": "#50E3C2",
+                        "background-light": "#f0f4f8",
+                        "surface": "#ffffff"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "mono": ["Space Grotesk", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="user-utils.js"></script>
+    <script src="user-header.js"></script>
+
+    <style>
+        /* Custom Scrollbar untuk Desktop */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light font-display text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header (Sticky dari user-header.js) -->
+    <div id="app-header"></div>
+
+    <!-- MAIN CONTAINER -->
+    <!-- Mobile: Flex Column (Stack) & Natural Scroll -->
+    <!-- Desktop: Grid Layout & Fixed Height (Independent Scroll) -->
+    <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+
+        <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 lg:h-[calc(100vh-9rem)]">
+
+            <!-- PANEL KIRI (PROFIL & SALDO) -->
+            <!-- Mobile: Order 1 (Atas). Desktop: Col Span 4, Scrollable if needed -->
+            <div class="lg:col-span-4 flex flex-col gap-6 lg:overflow-y-auto custom-scroll p-1 order-1">
+
+                <!-- Kartu Profil Utama -->
+                <div class="glass-card rounded-[2rem] p-8 shadow-xl shadow-blue-900/5 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-primary/20 to-secondary/20 -z-10">
+                    </div>
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+
+                    <div class="flex flex-col items-center text-center">
+                        <div class="relative mb-4 group cursor-pointer" onclick="openEditModal()">
+                            <div
+                                class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-white shadow-lg ring-4 ring-white/50 relative z-10">
+                                <img id="profile-avatar" src="" class="w-full h-full rounded-full object-cover">
+                            </div>
+                            <div
+                                class="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full shadow-lg z-20 hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </div>
+                        </div>
+
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tight" id="profile-name">User</h2>
+                        <span
+                            class="px-3 py-1 mt-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100 uppercase tracking-wider">Warga
+                            Aktif</span>
+
+                        <div class="mt-6 w-full space-y-3">
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/60 border border-white">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                                    <span class="material-symbols-outlined text-lg">mail</span>
+                                </div>
+                                <div class="text-left overflow-hidden min-w-0">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Email</p>
+                                    <p class="text-sm font-medium truncate" id="profile-email">...</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/60 border border-white">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                                    <span class="material-symbols-outlined text-lg">call</span>
+                                </div>
+                                <div class="text-left overflow-hidden min-w-0">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">WhatsApp</p>
+                                    <p class="text-sm font-medium font-mono truncate" id="profile-phone">...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu Saldo (Wallet Card) -->
+                <div
+                    class="bg-slate-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden flex-shrink-0">
+                    <div class="absolute top-0 right-0 p-8 opacity-5">
+                        <span class="material-symbols-outlined text-[8rem]">account_balance_wallet</span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Eco-Wallet
+                                </p>
+                                <div class="flex items-baseline gap-1">
+                                    <h3 class="text-4xl font-black font-mono tracking-tighter" id="wallet-balance">0
+                                    </h3>
+                                    <span class="text-sm font-bold text-slate-500">Pts</span>
+                                </div>
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                                <span class="material-symbols-outlined text-yellow-400">monetization_on</span>
+                            </div>
+                        </div>
+
+                        <p class="text-slate-400 text-xs mb-4">Tukar poin dengan hadiah menarik.</p>
+
+                        <!-- Scroll to store (Mobile) or Focus (Desktop) -->
+                        <button onclick="scrollToStore()"
+                            class="w-full py-3 bg-primary hover:bg-blue-600 rounded-xl font-bold text-sm shadow-lg shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <span>Buka Katalog</span>
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PANEL KANAN (KATALOG & RIWAYAT) -->
+            <!-- Mobile: Order 2 (Bawah), Natural Height. Desktop: Col Span 8, Internal Scroll -->
+            <div id="right-panel"
+                class="lg:col-span-8 bg-white rounded-[2rem] border border-slate-200 shadow-sm flex flex-col lg:overflow-hidden order-2 min-h-[500px]">
+
+                <!-- STICKY TABS HEADER -->
+                <!-- Mobile: Sticky top-16 (Below Navbar). Desktop: Sticky top-0 (Inside Container). -->
+                <div
+                    class="sticky top-16 sm:top-20 lg:top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 flex shrink-0">
+                    <button onclick="switchTab('store')" id="tab-btn-store"
+                        class="flex-1 py-4 text-sm font-bold text-primary border-b-2 border-primary bg-blue-50/50 transition-all flex justify-center items-center gap-2 hover:bg-blue-50">
+                        <span class="material-symbols-outlined text-lg">storefront</span> <span
+                            class="hidden sm:inline">Katalog</span> Hadiah
+                    </button>
+                    <button onclick="switchTab('history')" id="tab-btn-history"
+                        class="flex-1 py-4 text-sm font-medium text-slate-500 hover:text-slate-800 transition-all flex justify-center items-center gap-2 hover:bg-slate-50">
+                        <span class="material-symbols-outlined text-lg">receipt_long</span> Riwayat <span
+                            class="hidden sm:inline">Transaksi</span>
+                    </button>
+                </div>
+
+                <!-- Scrollable Content Area -->
+                <div class="flex-1 lg:overflow-y-auto custom-scroll p-4 sm:p-6 lg:p-8">
+
+                    <!-- TAB STORE -->
+                    <div id="tab-content-store" class="animate-fade-in">
+                        <div id="rewards-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                            <!-- JS Inject Here -->
+                        </div>
+                        <div id="empty-store"
+                            class="hidden flex flex-col items-center justify-center py-12 text-center">
+                            <div
+                                class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="material-symbols-outlined text-3xl text-slate-300">inventory_2</span>
+                            </div>
+                            <p class="text-slate-800 font-bold text-sm">Katalog Kosong</p>
+                            <p class="text-xs text-slate-500 mt-1">Belum ada item hadiah yang tersedia saat ini.</p>
+                        </div>
+                    </div>
+
+                    <!-- TAB HISTORY -->
+                    <div id="tab-content-history" class="hidden animate-fade-in">
+                        <div id="empty-history" class="hidden py-12 text-center">
+                            <div
+                                class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="material-symbols-outlined text-3xl text-slate-300">receipt_long</span>
+                            </div>
+                            <p class="text-slate-800 font-bold text-sm">Belum ada transaksi</p>
+                        </div>
+                        <div class="space-y-3" id="history-list">
+                            <!-- JS Inject Here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL EDIT PROFIL -->
+    <div id="edit-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 relative transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+            id="edit-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black text-slate-900">Edit Profil</h3>
+                <button onclick="closeEditModal()"
+                    class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <form class="space-y-4" onsubmit="return false;">
+                <div>
+                    <label
+                        class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Avatar</label>
+                    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" id="avatar-selector"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama</label>
+                    <input type="text" id="edit-name"
+                        class="w-full rounded-xl border-slate-200 px-3 py-2 text-sm focus:ring-primary focus:border-primary font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp</label>
+                    <input type="tel" id="edit-phone"
+                        class="w-full rounded-xl border-slate-200 px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                    <input type="email" id="edit-email"
+                        class="w-full rounded-xl border-slate-200 px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                </div>
+                <button type="button" onclick="saveProfileData()"
+                    class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-primary transition-all mt-2">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI REDEEM -->
+    <div id="confirm-modal"
+        class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-xs p-6 relative transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+            id="confirm-content">
+            <h3 class="text-lg font-black text-slate-900 mb-4">Tukar Poin?</h3>
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
+                <p class="text-sm font-bold text-slate-900" id="confirm-item-name">...</p>
+                <p class="text-xs text-slate-500 font-mono mt-0.5"><span id="confirm-cost"
+                        class="font-bold text-blue-600">0</span> Poin akan dipotong.</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1" id="input-label">Nomor
+                    Tujuan</label>
+                <input type="text" id="redeem-input"
+                    class="w-full rounded-xl border-slate-300 text-sm font-mono px-3 py-2 focus:ring-primary"
+                    placeholder="0812...">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal()"
+                    class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200">Batal</button>
+                <button onclick="processRedeem()" id="btn-process"
+                    class="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-primary">Proses</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUKSES (STRUK) -->
+    <div id="success-modal"
+        class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+        <div class="bg-white rounded-2xl w-full max-w-xs relative transform scale-95 opacity-0 transition-all duration-300 shadow-2xl overflow-hidden"
+            id="success-content">
+            <div class="bg-green-500 p-6 text-center text-white relative">
+                <div
+                    class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                    <span class="material-symbols-outlined text-2xl">check</span>
+                </div>
+                <h3 class="text-lg font-black uppercase tracking-widest">Berhasil</h3>
+                <p class="text-xs text-green-100 opacity-90" id="receipt-date">...</p>
+                <div class="absolute bottom-[-6px] left-0 right-0 h-3 bg-transparent"
+                    style="background: radial-gradient(circle, transparent 50%, white 50%) 0 -6px / 12px 12px repeat-x;">
+                </div>
+            </div>
+            <div class="p-6 pt-8 text-center">
+                <h4 class="text-lg font-black text-slate-900 leading-tight mb-4" id="receipt-item">...</h4>
+                <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-3 mb-6 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all group"
+                    onclick="copyCode()">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 tracking-widest">KODE VOUCHER</p>
+                    <p class="text-xl font-mono font-black text-slate-900 tracking-wider break-all group-hover:text-blue-600"
+                        id="receipt-code">...</p>
+                    <p class="text-[9px] text-primary font-bold mt-1">Ketuk untuk Salin</p>
+                </div>
+                <button onclick="window.location.reload()"
+                    class="w-full py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 text-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let freshUser = null;
+        let selectedItem = null;
+        let selectedAvatar = "";
+
+        const AVATARS = [
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=Zoro",
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna",
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=Naufal"
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = requireLogin();
+            renderHeader('profile');
+            loadUIData();
+            window.addEventListener('walletUpdated', loadUIData);
+            window.addEventListener('profileUpdated', loadUIData);
+        });
+
+        function loadUIData() {
+            const balance = getCurrentBalance();
+            const users = getSharedUsers();
+            freshUser = users.find(u => u.id === currentUser.id) || currentUser;
+
+            document.getElementById('profile-name').innerText = freshUser.name;
+            document.getElementById('profile-email').innerText = freshUser.email;
+            document.getElementById('profile-phone').innerText = freshUser.phone || '-';
+            document.getElementById('profile-avatar').src = freshUser.avatar;
+            document.getElementById('wallet-balance').innerText = balance;
+
+            loadRewards();
+            const txs = getTransactionHistory();
+            renderHistory(txs);
+        }
+
+        function loadRewards() {
+            const container = document.getElementById('rewards-list');
+            const empty = document.getElementById('empty-store');
+            const rewards = JSON.parse(sessionStorage.getItem('shared_rewards')) || [];
+
+            container.innerHTML = '';
+
+            if (rewards.length === 0) {
+                container.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            empty.classList.add('hidden');
+
+            rewards.forEach(item => {
+                let theme = { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'local_offer' };
+                if (item.category === 'PLN') theme = { bg: 'bg-yellow-50', text: 'text-yellow-600', icon: 'bolt' };
+                else if (item.category === 'Pulsa') theme = { bg: 'bg-red-50', text: 'text-red-600', icon: 'phonelink_ring' };
+                else if (item.category === 'E-Wallet') theme = { bg: 'bg-green-50', text: 'text-green-600', icon: 'account_balance_wallet' };
+
+                const html = `
+                    <div class="group border border-slate-100 rounded-2xl p-4 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all bg-white relative overflow-hidden flex flex-col h-full">
+                        <div class="absolute top-0 right-0 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">${item.cost} Pts</div>
+                        
+                        <div class="h-28 ${theme.bg} rounded-xl mb-4 flex items-center justify-center ${theme.text} group-hover:scale-105 transition-transform shrink-0">
+                            <span class="material-symbols-outlined text-5xl">${theme.icon}</span>
+                        </div>
+                        
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 line-clamp-1">${item.name}</h4>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">${item.description || 'Tukarkan poin Anda dengan item ini.'}</p>
+                        </div>
+                        
+                        <button onclick="initiateRedeem(${item.cost}, '${item.name}', '${item.category}')" 
+                            class="w-full py-2.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-primary transition-colors mt-auto">
+                            Tukar
+                        </button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderHistory(transactions) {
+            const container = document.getElementById('history-list');
+            const empty = document.getElementById('empty-history');
+            container.innerHTML = '';
+
+            if (transactions.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            transactions.forEach(tx => {
+                const isCredit = tx.type === 'CREDIT';
+                const icon = isCredit ? 'add_circle' : 'remove_circle';
+                const colorClass = isCredit ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                const sign = isCredit ? '+' : '-';
+
+                const item = `
+                    <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full ${colorClass} flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-xl">${icon}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate-800 truncate">${tx.description}</p>
+                                <p class="text-xs text-slate-400 font-mono">${tx.date.split(',')[0]}</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-black font-mono ${isCredit ? 'text-green-600' : 'text-red-600'} ml-2">${sign}${tx.amount}</span>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', item);
+            });
+        }
+
+        // --- TABS & SCROLL HELPER ---
+        function switchTab(tab) {
+            const store = document.getElementById('tab-content-store');
+            const history = document.getElementById('tab-content-history');
+            const btnStore = document.getElementById('tab-btn-store');
+            const btnHistory = document.getElementById('tab-btn-history');
+
+            if (tab === 'store') {
+                store.classList.remove('hidden');
+                history.classList.add('hidden');
+                btnStore.classList.add('text-primary', 'border-b-2', 'border-primary', 'bg-blue-50/50');
+                btnStore.classList.remove('text-slate-500');
+                btnHistory.classList.remove('text-primary', 'border-b-2', 'border-primary', 'bg-blue-50/50');
+                btnHistory.classList.add('text-slate-500');
+            } else {
+                store.classList.add('hidden');
+                history.classList.remove('hidden');
+                btnHistory.classList.add('text-primary', 'border-b-2', 'border-primary', 'bg-blue-50/50');
+                btnHistory.classList.remove('text-slate-500');
+                btnStore.classList.remove('text-primary', 'border-b-2', 'border-primary', 'bg-blue-50/50');
+                btnStore.classList.add('text-slate-500');
+            }
+        }
+
+        function scrollToStore() {
+            // Function to scroll to the store section
+            // On mobile: scroll window. On desktop: scroll inner container.
+            const rightPanel = document.getElementById('right-panel');
+
+            // Check if we are in mobile/stack mode or desktop/grid mode
+            // Simple check: is window width >= 1024px?
+            if (window.innerWidth >= 1024) {
+                // Desktop: Scroll internal panel
+                const contentArea = rightPanel.querySelector('.custom-scroll');
+                if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // Mobile: Scroll window to Right Panel
+                const offset = 80; // Offset for sticky header + spacing
+                const top = rightPanel.getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+            switchTab('store');
+        }
+
+        // --- EDIT PROFILE ---
+        function openEditModal() {
+            document.getElementById('edit-name').value = freshUser.name;
+            document.getElementById('edit-email').value = freshUser.email;
+            document.getElementById('edit-phone').value = freshUser.phone;
+            selectedAvatar = freshUser.avatar || AVATARS[0];
+            renderAvatarList();
+            showModal('edit-modal', 'edit-content');
+        }
+
+        function renderAvatarList() {
+            const selector = document.getElementById('avatar-selector');
+            selector.innerHTML = '';
+            AVATARS.forEach(url => {
+                const isSelected = url === selectedAvatar;
+                const ringClass = isSelected ? 'ring-2 ring-primary ring-offset-2 opacity-100 scale-105' : 'opacity-60 hover:opacity-100 grayscale hover:grayscale-0';
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = `w-12 h-12 rounded-full bg-slate-100 cursor-pointer transition-all ${ringClass}`;
+                img.onclick = () => { selectedAvatar = url; renderAvatarList(); };
+                selector.appendChild(img);
+            });
+        }
+
+        function saveProfileData() {
+            const newName = document.getElementById('edit-name').value;
+            const newPhone = document.getElementById('edit-phone').value;
+            const newEmail = document.getElementById('edit-email').value;
+
+            if (!newName) return alert("Nama wajib diisi");
+
+            const users = getSharedUsers();
+            const idx = users.findIndex(u => u.id === currentUser.id);
+            if (idx !== -1) {
+                users[idx].name = newName;
+                users[idx].phone = newPhone;
+                users[idx].email = newEmail;
+                users[idx].avatar = selectedAvatar;
+                saveSharedUsers(users);
+
+                const session = getActiveSession();
+                session.name = newName;
+                session.avatar = selectedAvatar;
+                sessionStorage.setItem('active_session', JSON.stringify(session));
+
+                loadUIData();
+                window.dispatchEvent(new Event('profileUpdated'));
+                closeEditModal();
+            }
+        }
+
+        function closeEditModal() { hideModal('edit-modal', 'edit-content'); }
+
+        // --- REDEEM LOGIC ---
+        function initiateRedeem(cost, name, type) {
+            if (getCurrentBalance() < cost) return alert("Poin tidak cukup!");
+            selectedItem = { cost, name, type };
+            document.getElementById('confirm-item-name').innerText = name;
+            document.getElementById('confirm-cost').innerText = cost;
+            document.getElementById('redeem-input').value = freshUser.phone || "";
+            document.getElementById('input-label').innerText = type === 'PLN' ? "ID Pelanggan" : "Nomor WhatsApp";
+            showModal('confirm-modal', 'confirm-content');
+        }
+
+        function processRedeem() {
+            const target = document.getElementById('redeem-input').value;
+            if (!target) return alert("Isi nomor tujuan!");
+
+            const btn = document.getElementById('btn-process');
+            btn.innerHTML = "Memproses...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const success = updateUserPoints(currentUser.id, -selectedItem.cost, `Tukar: ${selectedItem.name}`);
+                if (success) {
+                    hideModal('confirm-modal', 'confirm-content');
+                    const code = generateRedeemCode(selectedItem.type);
+                    showSuccessModal(code);
+                }
+                btn.innerHTML = "Proses";
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        function showSuccessModal(code) {
+            document.getElementById('receipt-item').innerText = selectedItem.name;
+            document.getElementById('receipt-date').innerText = new Date().toLocaleString('id-ID');
+            document.getElementById('receipt-code').innerText = code;
+            showModal('success-modal', 'success-content');
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('receipt-code').innerText);
+            alert("Kode disalin!");
+        }
+
+        function closeConfirmModal() { hideModal('confirm-modal', 'confirm-content'); }
+
+        // --- MODAL UTILS ---
+        function showModal(modalId, contentId) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function hideModal(modalId, contentId) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+    </script>
+</body>
+
+</html>

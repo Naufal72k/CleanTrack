@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifikasi - CleanTrack</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2A62C8",
+                        "secondary": "#50E3C2",
+                        "background-light": "#f8fafc",
+                        "surface": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="user-utils.js"></script>
+    <script src="user-header.js"></script>
+</head>
+
+<body class="bg-background-light font-display text-slate-800 antialiased selection:bg-primary/20">
+
+    <div id="app-header"></div>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-64px)]">
+
+        <div class="max-w-3xl mx-auto">
+
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-slate-900">Notifikasi</h1>
+                    <p class="text-sm text-slate-500">Pantau perkembangan dan respon dari petugas.</p>
+                </div>
+                <button onclick="markAllRead()"
+                    class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">done_all</span> Tandai Dibaca
+                </button>
+            </div>
+
+            <div id="notification-feed" class="space-y-3">
+            </div>
+
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-center">
+                <div class="bg-slate-100 p-6 rounded-full mb-4 animate-pulse">
+                    <span class="material-symbols-outlined text-4xl text-slate-300">notifications_off</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Tidak ada notifikasi baru</h3>
+                <p class="text-slate-500 text-sm max-w-xs mx-auto">Saat Admin merespon laporan Anda, infonya akan muncul
+                    di sini.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="detail-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform scale-95 opacity-0 transition-all duration-200"
+            id="modal-content-wrapper">
+
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">info</span> Detail Aktivitas
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="modal-content" class="space-y-4">
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">
+                    Tutup
+                </button>
+                <button onclick="window.location.href='MyWasteReports.html'"
+                    class="w-full sm:w-auto bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary transition-colors flex items-center justify-center gap-2">
+                    Lihat Laporan Lengkap <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = requireLogin();
+            renderHeader('notifications');
+            initNotifications();
+
+            window.addEventListener('storageUpdated', () => {
+                initNotifications();
+            });
+        });
+
+        function initNotifications() {
+            const reports = getSharedReports();
+            const myReports = reports.filter(r => r.userId === currentUser.id);
+            const feed = document.getElementById('notification-feed');
+            const emptyState = document.getElementById('empty-state');
+
+            let notifications = [];
+
+            // Parse Timeline menjadi Notifikasi
+            myReports.forEach(report => {
+                if (report.timeline && report.timeline.length > 0) {
+                    report.timeline.forEach(event => {
+                        // LOGIK PESAN DINAMIS (REJECTION FEEDBACK LOOP)
+                        let displayMessage = getMessageForStatus(event.status);
+
+                        // Jika Rejected, ambil cuplikan alasan admin untuk preview
+                        if (event.status === 'Rejected' && report.adminNotes) {
+                            // Ambil 30 karakter pertama
+                            const reasonSnippet = report.adminNotes.length > 35
+                                ? report.adminNotes.substring(0, 35) + "..."
+                                : report.adminNotes;
+                            displayMessage = `<span class="text-red-600">Ditolak:</span> ${reasonSnippet}`;
+                        }
+
+                        notifications.push({
+                            reportId: report.id,
+                            reportTitle: report.category,
+                            reportLocation: report.location,
+                            status: event.status,
+                            date: event.date,
+                            adminResponse: report.adminNotes,
+                            icon: getIconForStatus(event.status),
+                            message: displayMessage,
+                            latest: event.latest
+                        });
+                    });
+                }
+            });
+
+            notifications.reverse(); // Terbaru di atas
+
+            if (notifications.length === 0) {
+                feed.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            feed.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            feed.innerHTML = '';
+
+            notifications.forEach((notif, index) => {
+                const style = getNotifStyle(notif.status);
+                const isUnread = index < 2; // Simulasi unread
+                const bgClass = isUnread ? 'bg-blue-50 border-blue-100 shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50';
+                const dotHtml = isUnread ? '<span class="w-2.5 h-2.5 rounded-full bg-blue-500 absolute top-4 right-4 animate-pulse"></span>' : '';
+
+                const html = `
+                    <div onclick="openDetail('${notif.reportId}', '${notif.status}')" 
+                         class="relative flex items-start gap-4 p-4 rounded-xl border ${bgClass} transition-all cursor-pointer group">
+                        
+                        ${dotHtml}
+
+                        <div class="w-12 h-12 rounded-full ${style.bg} flex items-center justify-center flex-shrink-0 border border-white shadow-sm">
+                            <span class="material-symbols-outlined ${style.text} text-xl">${notif.icon}</span>
+                        </div>
+
+                        <div class="flex-1 min-w-0 pr-6">
+                            <div class="flex justify-between items-start mb-0.5">
+                                <p class="text-sm font-bold text-slate-800 ${style.text}">
+                                    ${notif.message}
+                                </p>
+                                <span class="text-[10px] text-slate-400 font-mono whitespace-nowrap ml-2">${notif.date}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 line-clamp-1">
+                                #${notif.reportId} • ${notif.reportTitle}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                feed.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- HELPERS ---
+
+        function getIconForStatus(status) {
+            if (status === 'Resolved') return 'check_circle';
+            if (status === 'In Progress') return 'engineering';
+            if (status === 'Rejected') return 'block';
+            return 'inbox';
+        }
+
+        function getNotifStyle(status) {
+            if (status === 'Resolved') return { bg: 'bg-green-100', text: 'text-green-600' };
+            if (status === 'In Progress') return { bg: 'bg-blue-100', text: 'text-blue-600' };
+            if (status === 'Rejected') return { bg: 'bg-red-100', text: 'text-red-600' };
+            return { bg: 'bg-slate-100', text: 'text-slate-500' };
+        }
+
+        function getMessageForStatus(status) {
+            if (status === 'Resolved') return 'Laporan Selesai & Ditangani';
+            if (status === 'In Progress') return 'Petugas Sedang Menangani';
+            if (status === 'Rejected') return 'Laporan Dikembalikan'; // Fallback text
+            return 'Laporan Berhasil Diterima';
+        }
+
+        // --- ACTIONS ---
+
+        function markAllRead() {
+            const items = document.querySelectorAll('#notification-feed > div');
+            items.forEach(item => {
+                item.classList.remove('bg-blue-50', 'border-blue-100', 'shadow-sm');
+                item.classList.add('bg-white', 'border-slate-200');
+                const dot = item.querySelector('.bg-blue-500');
+                if (dot) dot.remove();
+            });
+            const headerDot = document.getElementById('header-notif-dot');
+            if (headerDot) headerDot.classList.add('hidden');
+        }
+
+        function openDetail(id, status) {
+            const modal = document.getElementById('detail-modal');
+            const wrapper = document.getElementById('modal-content-wrapper');
+            const content = document.getElementById('modal-content');
+
+            const reports = getSharedReports();
+            const report = reports.find(r => r.id === id);
+
+            if (report) {
+                // KONFIGURASI BLOK EDUKASI (REJECTION BLOCK)
+                // Ini akan tampil PALING ATAS di modal jika status Rejected
+                let topAlertBlock = '';
+
+                if (status === 'Rejected') {
+                    topAlertBlock = `
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4 animate-pulse">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="material-symbols-outlined text-red-600">warning</span>
+                                <p class="text-xs font-bold text-red-600 uppercase tracking-wider">ALASAN PENOLAKAN</p>
+                            </div>
+                            <p class="text-sm text-red-900 font-bold leading-relaxed">
+                                "${report.adminNotes || 'Mohon periksa kembali kelengkapan laporan Anda.'}"
+                            </p>
+                            <p class="text-[10px] text-red-500 mt-2 italic">
+                                *Laporan ini tidak dapat diproses. Silakan perbaiki dan kirim ulang.
+                            </p>
+                        </div>
+                    `;
+                }
+
+                // Status Badge Color
+                let statusColor = 'text-slate-600';
+                if (status === 'Resolved') statusColor = 'text-green-600';
+                if (status === 'In Progress') statusColor = 'text-blue-600';
+                if (status === 'Rejected') statusColor = 'text-red-600';
+
+                // Inject Content: TOP ALERT + INFO LAPORAN
+                content.innerHTML = `
+                    ${topAlertBlock} <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-slate-400 font-mono tracking-wider">ID: ${report.id}</span>
+                            <span class="text-xs font-black uppercase ${statusColor}">${status}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-lg mb-1 leading-tight">${report.category}</h4>
+                        <div class="flex items-start gap-1 text-xs text-slate-500 mb-2">
+                            <span class="material-symbols-outlined text-sm mt-0.5">location_on</span>
+                            <span class="line-clamp-1">${report.location}</span>
+                        </div>
+                         ${report.adminNotes && status !== 'Rejected' ? `
+                            <div class="mt-3 pt-3 border-t border-slate-200">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Catatan Petugas</p>
+                                <p class="text-xs text-slate-700 mt-1">"${report.adminNotes}"</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    wrapper.classList.remove('scale-95', 'opacity-0');
+                    wrapper.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            const wrapper = document.getElementById('modal-content-wrapper');
+
+            wrapper.classList.remove('scale-100', 'opacity-100');
+            wrapper.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+    </script>
+</body>
+
+</html>

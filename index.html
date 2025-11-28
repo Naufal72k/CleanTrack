@@ -186,11 +186,13 @@
 
 <body class="font-display bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
+    <!-- NAVBAR FIXED -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div
                 class="flex justify-between items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3 shadow-lg">
 
+                <!-- Logo -->
                 <a href="#" class="flex items-center gap-2 group">
                     <div
                         class="bg-primary text-white p-2 rounded-xl group-hover:bg-secondary transition-colors duration-300">
@@ -203,7 +205,8 @@
                     </div>
                 </a>
 
-                <div class="hidden md:flex items-center gap-8">
+                <!-- Desktop Menu (Hidden on Tablet/Mobile) -->
+                <div class="hidden lg:flex items-center gap-8">
                     <a href="#features"
                         class="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Fitur</a>
                     <a href="#how-it-works"
@@ -214,9 +217,10 @@
                         class="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Ulasan</a>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <!-- Desktop Action (Hidden on Tablet/Mobile) -->
+                <div class="hidden lg:flex items-center gap-3">
                     <a href="Login.html"
-                        class="hidden sm:block text-sm font-bold text-slate-700 hover:text-primary transition-colors">Masuk</a>
+                        class="text-sm font-bold text-slate-700 hover:text-primary transition-colors">Masuk</a>
                     <a href="Register.html"
                         class="bg-slate-900 hover:bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-primary/30 active:scale-95 flex items-center gap-2">
                         <span>Daftar Sekarang</span>
@@ -224,9 +228,78 @@
                     </a>
                 </div>
 
+                <!-- Hamburger Button (Visible on Tablet/Mobile) -->
+                <button onclick="toggleMobileSidebar()"
+                    class="lg:hidden p-2 text-slate-700 hover:bg-white/20 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                </button>
+
             </div>
         </div>
     </nav>
+
+    <!-- MOBILE SIDEBAR OVERLAY (Sidebar untuk Tablet/HP) -->
+    <div id="mobile-overlay" onclick="toggleMobileSidebar()"
+        class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden transition-opacity opacity-0"></div>
+
+    <aside id="mobile-sidebar"
+        class="fixed top-0 right-0 bottom-0 w-[300px] bg-white/95 backdrop-blur-xl z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col border-l border-white/20">
+
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-2xl">recycling</span>
+                <span class="text-lg font-black text-slate-900">CleanTrack</span>
+            </div>
+            <button onclick="toggleMobileSidebar()"
+                class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto p-6 space-y-2">
+            <a href="#features" onclick="toggleMobileSidebar()"
+                class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group">
+                <div
+                    class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
+                    <span class="material-symbols-outlined text-xl">star</span>
+                </div>
+                <span class="font-bold text-slate-700 text-lg">Fitur Unggulan</span>
+            </a>
+            <a href="#how-it-works" onclick="toggleMobileSidebar()"
+                class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group">
+                <div
+                    class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-100 group-hover:text-green-700 transition-colors">
+                    <span class="material-symbols-outlined text-xl">tips_and_updates</span>
+                </div>
+                <span class="font-bold text-slate-700 text-lg">Cara Kerja</span>
+            </a>
+            <a href="#impact" onclick="toggleMobileSidebar()"
+                class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group">
+                <div
+                    class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
+                    <span class="material-symbols-outlined text-xl">analytics</span>
+                </div>
+                <span class="font-bold text-slate-700 text-lg">Dampak</span>
+            </a>
+            <a href="#testimonials" onclick="toggleMobileSidebar()"
+                class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group">
+                <div
+                    class="w-10 h-10 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
+                    <span class="material-symbols-outlined text-xl">forum</span>
+                </div>
+                <span class="font-bold text-slate-700 text-lg">Ulasan Warga</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-slate-100 bg-slate-50 space-y-3">
+            <a href="Login.html"
+                class="block w-full py-4 text-center font-bold text-slate-600 hover:text-primary transition-colors">Masuk
+                Akun</a>
+            <a href="Register.html"
+                class="block w-full py-4 bg-primary text-white rounded-xl font-bold text-center shadow-lg shadow-primary/30 active:scale-95 transition-all">Daftar
+                Sekarang</a>
+        </div>
+    </aside>
 
     <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
 
@@ -259,7 +332,7 @@
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <a href="index.html"
+                        <a href="MyWasteReports.html"
                             class="px-8 py-4 bg-primary hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3">
                             <span class="material-symbols-outlined">add_a_photo</span>
                             Mulai Lapor
@@ -294,7 +367,9 @@
                     </div>
                 </div>
 
-                <div class="relative hidden lg:block h-[800px] w-full reveal delay-200">
+                <!-- HERO IMAGE (PHONE MOCKUP) - UPDATED FOR MOBILE VISIBILITY -->
+                <!-- Removed 'hidden' class and adjusted sizes for responsive display -->
+                <div class="relative h-[500px] lg:h-[800px] w-full reveal delay-200 mt-12 lg:mt-0">
 
                     <div
                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-slate-200 rounded-full animate-[spin_60s_linear_infinite]">
@@ -303,7 +378,9 @@
                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-50/50 rounded-full blur-3xl">
                     </div>
 
-                    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[320px] animate-float">
+                    <!-- Adjusted top positioning and width for mobile -->
+                    <div
+                        class="absolute top-0 lg:top-10 left-1/2 -translate-x-1/2 w-[280px] sm:w-[320px] animate-float">
                         <div class="phone-mockup">
                             <div class="phone-notch"></div>
 
@@ -376,7 +453,7 @@
                                     <div
                                         class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 opacity-60">
                                         <div class="w-16 h-16 bg-slate-200 rounded-xl overflow-hidden relative">
-                                            <img src="assets/pexels-stijn-dijkstra-1306815-2583836.jpg"
+                                            <img src="/assets/pexels-stijn-dijkstra-1306815-2583836.jpg"
                                                 class="w-full h-full object-cover">
                                         </div>
                                         <div class="flex-1">
@@ -606,7 +683,7 @@
                     <div
                         class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl">
                     </div>
-                    <img src="/assets/pexels-mali-802221.jpg"
+                    <img src="assets/pexels-mali-802221.jpg"
                         class="relative rounded-3xl shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500 w-full object-cover h-[500px]">
 
                     <div
@@ -633,7 +710,7 @@
             <h2 class="text-4xl md:text-5xl font-black mb-6">Pantau Kebersihan Kota Secara Transparan</h2>
             <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-10">Lihat peta panas (heat map) penyebaran sampah dan
                 pantau kinerja petugas kebersihan langsung dari aplikasi.</p>
-            <a href="index.html"
+            <a href="MyWasteReports.html"
                 class="inline-block px-8 py-4 bg-secondary hover:bg-secondary-dark text-slate-900 rounded-2xl font-bold text-lg shadow-neon transition-all">
                 Lihat Peta Live
             </a>
@@ -751,7 +828,7 @@
                             class="px-8 py-4 bg-primary hover:bg-blue-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-primary/50 transition-all transform hover:-translate-y-1">
                             Daftar Sekarang - Gratis
                         </a>
-                        <a href="index.html"
+                        <a href="Login.html"
                             class="px-8 py-4 bg-transparent border border-slate-600 hover:bg-white/10 text-white rounded-2xl font-bold text-lg transition-all">
                             Masuk Akun
                         </a>
@@ -861,6 +938,27 @@
         window.addEventListener("scroll", reveal);
         // Trigger once on load
         reveal();
+
+        // Mobile Sidebar Toggle Logic
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const body = document.body;
+
+            if (sidebar.classList.contains('translate-x-full')) {
+                // Open Sidebar
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                body.style.overflow = 'hidden'; // Prevent scrolling
+            } else {
+                // Close Sidebar
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+                body.style.overflow = ''; // Enable scrolling
+            }
+        }
     </script>
 </body>
 

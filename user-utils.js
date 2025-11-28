@@ -1,5 +1,5 @@
 /**
- * CleanTrack Core Utilities (VERSION 12 - SYNC FIX & CLEAN SLATE)
+ * CleanTrack Core Utilities (VERSION 13 - DESIGN & DUMMY FIX)
  * File: user-utils.js
  */
 
@@ -7,16 +7,15 @@ const KEYS = {
     REPORTS: 'shared_reports',
     USERS: 'shared_users',
     TRANSACTIONS: 'shared_tx',
-    REWARDS: 'shared_rewards', // Kunci yang SAMA dengan Admin
+    REWARDS: 'shared_rewards', 
     CURRENT_SESSION: 'active_session',
-    INIT_FLAG: 'cleanTrack_v12_sync_fix' // Versi baru untuk reset data otomatis
+    INIT_FLAG: 'cleanTrack_v13_design_fix' // Versi baru untuk reset data
 };
 
 // ==========================================
 // 0. ASSET LIBRARY (KOLEKSI GAMBAR REALISTIS & HD)
 // ==========================================
 
-// Koleksi Foto Sampah/Kebersihan Berkualitas Tinggi
 const TRASH_IMAGES = [
     "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=600&auto=format&fit=crop", 
     "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=600&auto=format&fit=crop", 
@@ -28,9 +27,8 @@ const TRASH_IMAGES = [
     "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=600&auto=format&fit=crop"  
 ];
 
-// Koleksi Avatar Warga
 const USER_AVATARS = [
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop", // Naufal
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop", 
     "https://randomuser.me/api/portraits/men/32.jpg", 
     "https://randomuser.me/api/portraits/women/44.jpg", 
     "https://randomuser.me/api/portraits/women/68.jpg", 
@@ -44,18 +42,17 @@ const USER_AVATARS = [
 // ==========================================
 
 (function initSharedData() {
-    // Cek apakah data versi terbaru sudah ada
     if (!sessionStorage.getItem(KEYS.INIT_FLAG)) {
-        console.log("🚀 Initializing CleanTrack Data (Clean History & Synced Rewards)...");
+        console.log("🚀 Initializing CleanTrack Data v13...");
 
-        // --- A. GENERATE USERS (POIN 0 UNTUK KEASLIAN) ---
+        // --- A. GENERATE USERS (DUMMY SUDAH PUNYA POIN) ---
         const userNames = [
             "Naufal Ihsanul", "Budi Santoso", "Siti Aminah", 
             "Rina Wati", "Ahmad Dani", "Dedi Corbuzier", "Maya Esti"
         ];
         
         let users = [];
-        // User Admin (Manual)
+        // Admin
         users.push({
             id: 'ADM-001', name: 'Super Admin', email: 'admin', password: 'admin',
             role: 'ADMIN', phone: '-', 
@@ -63,47 +60,49 @@ const USER_AVATARS = [
             joined: '01/01/2025', status: 'Active', points: 9999
         });
 
-        // Loop User Warga
+        // User Warga (Naufal dkk)
         userNames.forEach((name, index) => {
-            const isMainUser = index === 0; // Naufal user pertama
+            const isMainUser = index === 0; // Naufal
             users.push({
                 id: `USR-00${index + 1}`,
                 name: name,
                 email: isMainUser ? 'naufal' : `user${index + 1}@mail.com`,
-                password: isMainUser ? '123' : '123',
+                password: '123',
                 role: 'USER',
                 phone: `0812${Math.floor(10000000 + Math.random() * 90000000)}`,
-                avatar: USER_AVATARS[index] || `https://ui-avatars.com/api/?name=${name}`,
+                avatar: USER_AVATARS[index],
                 joined: getRandomDate('year'), 
                 status: index === 5 ? 'Blocked' : 'Active',
-                points: 0 // CLEAN SLATE: Poin awal 0 agar realistis
+                // POINT REVISI: Naufal punya poin, User lain random, User baru (register nanti) start 0
+                points: isMainUser ? 450 : Math.floor(Math.random() * 500) 
             });
         });
         sessionStorage.setItem(KEYS.USERS, JSON.stringify(users));
 
 
-        // --- B. GENERATE REWARDS (SINKRONISASI ADMIN & USER) ---
-        // Kita buat data hadiah di sini agar User langsung melihatnya tanpa harus buka Admin dulu.
+        // --- B. GENERATE REWARDS (GAMBAR HD & SINKRON) ---
         const defaultRewards = [
             {
                 id: 'RWD-001',
-                name: 'Token PLN 20k',
+                name: 'Token Listrik 20k',
                 cost: 200,
                 category: 'PLN',
                 description: 'Voucher listrik prabayar nominal 20.000.',
                 stock: 50,
-                image: 'https://images.unsplash.com/photo-1550565118-c974fb636248?auto=format&fit=crop&w=300&q=80',
+                // Gambar HD Lampu/Listrik
+                image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=600&q=80',
                 api_provider: 'NUSANTARA_DATA',
                 api_code: 'PLN20'
             },
             {
                 id: 'RWD-002',
-                name: 'Pulsa Reguler 10k',
+                name: 'Pulsa All Op 10k',
                 cost: 100,
                 category: 'Pulsa',
-                description: 'Pulsa All Operator masa aktif 30 hari.',
+                description: 'Pulsa reguler menambah masa aktif 30 hari.',
                 stock: 100,
-                image: 'https://images.unsplash.com/photo-1512428559087-560fa5ce7d5b?auto=format&fit=crop&w=300&q=80',
+                // Gambar HD Smartphone
+                image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80',
                 api_provider: 'NUSANTARA_DATA',
                 api_code: 'HPS10'
             },
@@ -112,11 +111,24 @@ const USER_AVATARS = [
                 name: 'Saldo GoPay 50k',
                 cost: 500,
                 category: 'E-Wallet',
-                description: 'Top up saldo e-wallet instan tanpa biaya admin.',
+                description: 'Top up saldo e-wallet instan bebas admin.',
                 stock: 25,
-                image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=300&q=80',
+                // Gambar HD Dompet Digital/Belanja
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu8LMOitCtLsqjPCBqAxWPasLVo5VxkY46MA&s',
                 api_provider: 'GOPAY_CORP',
                 api_code: 'GOPAY50'
+            },
+            {
+                id: 'RWD-004',
+                name: 'Voucher Indomaret',
+                cost: 150,
+                category: 'Voucher',
+                description: 'Potongan belanja Rp 15.000 di seluruh gerai.',
+                stock: 200,
+                // Gambar HD Keranjang Belanja
+                image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=600&q=80',
+                api_provider: 'INDO_GIFT',
+                api_code: 'IDM15'
             }
         ];
         sessionStorage.setItem(KEYS.REWARDS, JSON.stringify(defaultRewards));
@@ -134,16 +146,15 @@ const USER_AVATARS = [
         let reportCounter = 10000;
 
         users.filter(u => u.role === 'USER').forEach((user) => {
-            // Kita kurangi jumlah laporan dummy agar tidak terlalu penuh
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 const dateStr = getRandomDate('month');
                 const status = statuses[Math.floor(Math.random() * statuses.length)];
                 const photoUrl = TRASH_IMAGES[Math.floor(Math.random() * TRASH_IMAGES.length)];
 
                 let adminNotes = "";
                 if (status === 'Rejected') adminNotes = "Foto bukti buram atau lokasi tidak valid.";
-                if (status === 'Resolved') adminNotes = "Laporan selesai ditindaklanjuti.";
-                if (status === 'In Progress') adminNotes = "Tim sedang menuju lokasi.";
+                if (status === 'Resolved') adminNotes = "Laporan selesai ditindaklanjuti tim kebersihan.";
+                if (status === 'In Progress') adminNotes = "Tim sedang menuju lokasi pelaporan.";
 
                 reports.push({
                     id: `CTR-${reportCounter++}`,
@@ -151,13 +162,13 @@ const USER_AVATARS = [
                     reporterName: user.name,
                     category: "Laporan Kebersihan",
                     location: locations[Math.floor(Math.random() * locations.length)],
-                    description: `Ditemukan tumpukan sampah yang mengganggu di area ini.`,
+                    description: `Ditemukan tumpukan sampah yang mengganggu di area ini. Mohon segera diangkut.`,
                     status: status,
                     priority: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
                     date: dateStr,
                     photos: [photoUrl], 
                     rating: status === 'Resolved' && Math.random() > 0.5 ? 5 : null,
-                    reviewContent: status === 'Resolved' ? "Terima kasih respon cepatnya!" : null,
+                    reviewContent: status === 'Resolved' ? "Respon sangat cepat!" : null,
                     adminNotes: adminNotes,
                     timeline: [{ status: 'Submitted', date: dateStr, latest: true }]
                 });
@@ -167,13 +178,16 @@ const USER_AVATARS = [
         sessionStorage.setItem(KEYS.REPORTS, JSON.stringify(reports));
 
 
-        // --- D. GENERATE TRANSACTIONS (CLEAN HISTORY) ---
-        // Array KOSONG agar akun terlihat baru dan bersih
-        const txs = []; 
+        // --- D. GENERATE TRANSACTIONS (DUMMY UNTUK NAUFAL) ---
+        // Kita buat riwayat transaksi palsu agar akun Naufal terlihat aktif
+        const txs = [
+            { id: 'TX-001', userId: 'USR-001', date: getRandomDate('month'), type: 'CREDIT', amount: 50, description: 'Bonus Login Mingguan' },
+            { id: 'TX-002', userId: 'USR-001', date: getRandomDate('week'), type: 'CREDIT', amount: 100, description: 'Reward Laporan #CTR-10001' },
+            { id: 'TX-003', userId: 'USR-001', date: getRandomDate('today'), type: 'CREDIT', amount: 300, description: 'Reward Laporan #CTR-10005' },
+            { id: 'TX-004', userId: 'USR-001', date: getRandomDate('today'), type: 'DEBIT', amount: 50, description: 'Tukar: Pulsa 5k' } // Ceritanya pernah tukar
+        ];
         sessionStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
 
-
-        // Set Flag Selesai
         sessionStorage.setItem(KEYS.INIT_FLAG, 'true');
     }
 })();
@@ -230,7 +244,6 @@ function updateUserPoints(userId, amount, description) {
         });
         sessionStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
 
-        // Update active session if needed
         const currentSession = getActiveSession();
         if (currentSession && currentSession.id === userId) {
             currentSession.points = users[index].points;
@@ -274,7 +287,6 @@ function getTransactionHistory() {
     const session = getActiveSession();
     const all = JSON.parse(sessionStorage.getItem(KEYS.TRANSACTIONS)) || [];
     if(!session) return [];
-    // Filter transaksi hanya milik user yang sedang login
     return all.filter(tx => !tx.userId || tx.userId === session.id);
 }
 

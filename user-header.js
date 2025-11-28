@@ -5,6 +5,7 @@
  * 1. Navbar Desktop Horizontal.
  * 2. Sidebar Drawer (Off-canvas) untuk Mobile & Tablet.
  * 3. Profil & Saldo di dalam Sidebar.
+ * 4. [UPDATE] Tombol Logout di Desktop.
  */
 
 function renderHeader(activePage) {
@@ -46,12 +47,10 @@ function renderHeader(activePage) {
 
     // 3. HTML Template
     const headerHTML = `
-    <!-- Top Navbar (Sticky) -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm transition-all">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-20">
                 
-                <!-- Left: Hamburger & Logo -->
                 <div class="flex items-center gap-3 sm:gap-6">
                     <button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20">
                         <span class="material-symbols-outlined text-2xl sm:text-3xl">menu</span>
@@ -68,37 +67,39 @@ function renderHeader(activePage) {
                     </a>
                 </div>
 
-                <!-- Center: Desktop Nav -->
                 <nav class="hidden lg:flex gap-8">
                     ${desktopNav}
                 </nav>
 
-                <!-- Right: Desktop Profile & Notif -->
                 <div class="flex items-center gap-2 sm:gap-4">
+                    
                     <a href="Notifications.html" class="relative flex items-center justify-center rounded-full size-10 text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors ${activePage === 'notifications' ? 'bg-gray-100 text-primary' : ''}">
                         <span class="material-symbols-outlined text-2xl">notifications</span>
                         <span id="header-notif-dot" class="hidden absolute top-2.5 right-3 size-2 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
                     </a>
 
-                    <!-- Desktop User Pill -->
                     <div class="hidden lg:flex items-center gap-3 pl-4 border-l border-gray-200">
-                        <div class="text-right hidden xl:block">
+                    <button onclick="confirmLogoutUser()" class="ml-2 flex items-center justify-center size-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 border border-red-100 transition-all" title="Keluar">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                        </button>
+                        <div class="text-right hidden xl:block cursor-pointer" onclick="window.location.href='UserProfile.html'">
                             <p class="text-sm font-bold text-gray-900 leading-none" id="header-name">${currentUser.name}</p>
                             <p class="text-xs text-gray-500 font-mono mt-1" id="header-points">${currentUser.points} Pts</p>
                         </div>
                         <img id="header-avatar" src="${currentUser.avatar}" class="size-10 rounded-full bg-gray-100 object-cover border border-gray-200 cursor-pointer" onclick="window.location.href='UserProfile.html'">
+                        
+                        
                     </div>
+
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Mobile/Tablet Sidebar Overlay (Off-Canvas) -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 hidden transition-opacity opacity-0"></div>
 
     <aside id="sidebar-panel" class="fixed top-0 left-0 bottom-0 w-[280px] bg-white z-[60] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out flex flex-col h-full lg:hidden">
         
-        <!-- Sidebar Header -->
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <div class="flex items-center gap-2">
                 <div class="bg-primary p-1.5 rounded-lg">
@@ -111,7 +112,6 @@ function renderHeader(activePage) {
             </button>
         </div>
 
-        <!-- User Profile Card (In Sidebar) -->
         <div class="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-b border-gray-100">
             <div class="flex items-center gap-4 mb-4">
                 <img id="mobile-avatar" src="${currentUser.avatar}" class="size-14 rounded-full bg-white p-1 border border-gray-200 object-cover shadow-sm">
@@ -133,14 +133,12 @@ function renderHeader(activePage) {
             </div>
         </div>
 
-        <!-- Sidebar Navigation -->
         <div class="flex-1 overflow-y-auto p-4 space-y-1">
             ${mobileNav}
         </div>
 
-        <!-- Sidebar Footer -->
         <div class="p-4 border-t border-gray-100 bg-gray-50">
-            <button onclick="logoutUser()" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-white border border-gray-200 text-red-600 font-bold hover:bg-red-50 hover:border-red-200 transition-all shadow-sm">
+            <button onclick="confirmLogoutUser()" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-white border border-gray-200 text-red-600 font-bold hover:bg-red-50 hover:border-red-200 transition-all shadow-sm">
                 <span class="material-symbols-outlined">logout</span>
                 Keluar Aplikasi
             </button>
@@ -169,9 +167,7 @@ window.toggleSidebar = function() {
     if (panel.classList.contains('-translate-x-full')) {
         // Open
         backdrop.classList.remove('hidden');
-        // Small delay to allow display block to apply before opacity transition
         setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
-        
         panel.classList.remove('-translate-x-full');
         body.style.overflow = 'hidden'; // Lock Scroll
     } else {
@@ -179,12 +175,17 @@ window.toggleSidebar = function() {
         backdrop.classList.add('opacity-0');
         panel.classList.add('-translate-x-full');
         body.style.overflow = ''; // Unlock Scroll
-        
         setTimeout(() => backdrop.classList.add('hidden'), 300);
     }
 }
 
-// ... rest of helpers (updateHeaderVisuals, checkSmartNotification) from previous version ...
+// --- LOGOUT CONFIRMATION ---
+window.confirmLogoutUser = function() {
+    if(confirm("Apakah Anda yakin ingin keluar?")) {
+        logoutUser(); // Memanggil fungsi dari user-utils.js
+    }
+}
+
 function updateHeaderVisuals() {
     const updatedSession = getActiveSession();
     if (!updatedSession) return;
